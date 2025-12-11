@@ -27,8 +27,10 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-this")
 # To run locally with DEBUG on, set DJANGO_DEBUG=True in your env.
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
-# Allowed hosts: comma separated in env (e.g. "localhost,127.0.0.1,mydomain.com")
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+ALLOWED_HOSTS = [
+    "https://ecommerce-backend-12-q8sv.onrender.com",
+]
+
 
 # -------------------------------------------------------------------
 # Installed apps / middleware (keeps your current apps)
@@ -62,10 +64,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
+CORS_ALLOW_ALL_ORIGINS =  "http://localhost:5173",
+
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
-
-ALLOWED_HOSTS = ["*"]
 
 # -------------------------------------------------------------------
 # Templates
