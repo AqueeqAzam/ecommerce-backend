@@ -65,6 +65,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
+ALLOWED_HOSTS = ["*"]
+
 # -------------------------------------------------------------------
 # Templates
 # -------------------------------------------------------------------
@@ -85,9 +87,6 @@ TEMPLATES = [
 
 # -------------------------------------------------------------------
 # Database configuration:
-# - If DATABASE_URL env exists, use it (Render/Heroku style)
-# - Otherwise fallback to local SQLite (development)
-# - You can still use your explicit local Postgres when developing
 # -------------------------------------------------------------------
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -106,20 +105,6 @@ else:
             'PORT': '5432',
         }
     }
-
-"""if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True)
-    }
-else:
-    # Local config (SQLite by default). To use local Postgres, set DATABASE_URL to postgres://... or override below.
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-"""
 
 # -------------------------------------------------------------------
 # REST Framework (keeps your JWT config; modify if you want anonymous orders)
