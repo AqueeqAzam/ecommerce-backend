@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: django-backend
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --preload"
+
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: django-postgres
+          property: connectionString
+
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: DJANGO_DEBUG
+        value: "False"
+
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+    staticPublishPath: staticfiles
+    plan: free  # optional, choose your plan
+
+databases:
+  - name: django-postgres
+    databaseName: django_db
+    user: django_user
