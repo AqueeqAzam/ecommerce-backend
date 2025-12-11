@@ -1,6 +1,13 @@
 import os
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+DATABASE_URL = os.getenv("DB_PASSWORD")
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,8 +18,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------------------------------------------------------
 # Basic: secrets & debug (use environment variables)
 # -------------------------------------------------------------------
-SECRET_KEY = 'django-insecure-gavf7g*xq+8@^kk5-j$&sfymkvhy)nfwzo!3cs#el=w19!ff+w'
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # -------------------------------------------------------------------
@@ -96,7 +101,7 @@ else:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'ecommerce',
             'USER': 'postgres',
-            'PASSWORD': 'Gres=2.718!=D',
+            'PASSWORD': 'DB_PASSWORD',
             'HOST': 'localhost',
             'PORT': '5432',
         }
