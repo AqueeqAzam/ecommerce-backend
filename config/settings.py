@@ -8,11 +8,11 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 DATABASE_URL = os.getenv("DB_PASSWORD")
 
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
 
 
 # -------------------------------------------------------------------
@@ -65,7 +65,12 @@ MIDDLEWARE = [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS =  "http://localhost:5173",
+CORS_ALLOWED_ORIGINS = [
+    "https://gilded-pegasus-ca4bb4.netlify.app",
+]
+
+CORS_ALLOW_ALL_HEADERS = True
+
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -144,10 +149,6 @@ USE_TZ = True
 # -------------------------------------------------------------------
 # Static & media files (WhiteNoise for static)
 # -------------------------------------------------------------------
-import os
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------
 # Static files
@@ -156,6 +157,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # or str(BASE_DIR / "staticfiles")
 STATIC_URL = "/static/"
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
 
 # -------------------------------------------------------------------
 # CORS (keep open in dev, restrict in production)
