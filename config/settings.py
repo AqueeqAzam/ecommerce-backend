@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DATABASE_URL = os.getenv("DB_PASSWORD")
+DATABASE_URL = os.getenv("DB_INTERNAL_URL")
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
@@ -23,16 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------------------------------------------------------
 # Basic: secrets & debug (use environment variables)
 # -------------------------------------------------------------------
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-this")
+
 # To run locally with DEBUG on, set DJANGO_DEBUG=True in your env.
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = [
-    "https://ecommerce-backend-12-q8sv.onrender.com",
-]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
 
-
-# -------------------------------------------------------------------
+# ------------------------------------------------------------------
 # Installed apps / middleware (keeps your current apps)
 # -------------------------------------------------------------------
 INSTALLED_APPS = [
