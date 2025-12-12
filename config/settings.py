@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DATABASE_URL = os.getenv("DB_INTERNAL_URL")
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
@@ -93,21 +92,32 @@ TEMPLATES = [
 # -------------------------------------------------------------------
 # Database configuration:
 # -------------------------------------------------------------------
-DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if os.getenv("RENDER"):
+# Render sets this automatically
+RENDER = os.environ.get("RENDER")
+
+# Get database URL from env
+DATABASE_URL = os.environ.get("DB_INTERNAL_URL")
+
+if RENDER and DATABASE_URL:
+    # Production: Render
     DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600)
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
 else:
+    # Local development
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'ecommerce',
-            'USER': 'postgres',
-            'PASSWORD': 'DB_PASSWORD',
-            'HOST': 'localhost',
-            'PORT': '5432',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "ecommerce",
+            "USER": "postgres",
+            "PASSWORD": "DB_PASSWORD",
+            "HOST": "localhost",
+            "PORT": "5432",
         }
     }
 
