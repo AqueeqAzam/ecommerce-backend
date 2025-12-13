@@ -25,15 +25,17 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 # -------------------------------------------------------------------
 # Hosts & CORS
 # -------------------------------------------------------------------
+# Hosts
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-CORS_ALLOW_CREDENTIALS = True
 
+# CORS
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    CORS_ALLOWED_ORIGINS = [
-        o.strip() for o in os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
-    ]
+    raw_origins = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "")
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_origins.split(",") if o.strip()]
+    CORS_ALLOW_CREDENTIALS = True
+
 
 # -------------------------------------------------------------------
 # Installed apps / middleware
