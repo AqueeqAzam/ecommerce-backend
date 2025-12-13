@@ -3,6 +3,9 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
+# -------------------------------------------------------------------
+# Load environment variables
+# -------------------------------------------------------------------
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -13,23 +16,27 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-
 # -------------------------------------------------------------------
-# Basic: secrets & debug (use environment variables)
+# Basic: secrets & debug
 # -------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# -------------------------------------------------------------------
-# Basic: secrets & debug (use environment variables)
-# -------------------------------------------------------------------
-
-# To run locally with DEBUG on, set DJANGO_DEBUG=True in your env.
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+# -------------------------------------------------------------------
+# Hosts & CORS
+# -------------------------------------------------------------------
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+CORS_ALLOW_CREDENTIALS = True
 
-# ------------------------------------------------------------------
-# Installed apps / middleware (keeps your current apps)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        o.strip() for o in os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
+    ]
+
+# -------------------------------------------------------------------
+# Installed apps / middleware
 # -------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -60,14 +67,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
-CORS_ALLOWED_ORIGINS = [
-    "https://gilded-pegasus-ca4bb4.netlify.app",
-]
-
-CORS_ALLOW_ALL_HEADERS = True
-
-
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -77,7 +76,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],   # add paths if you use server-rendered templates
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -90,56 +89,43 @@ TEMPLATES = [
 ]
 
 # -------------------------------------------------------------------
-# Database configuration:
+# Database configuration
 # -------------------------------------------------------------------
-
-# Render sets this automatically
 RENDER = os.environ.get("RENDER")
-
-# Get database URL from env
 DATABASE_URL = os.environ.get("DB_INTERNAL_URL")
 
 if RENDER and DATABASE_URL:
-    # Production: Render
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,
-            ssl_require=True
+            ssl_require=True,
         )
     }
 else:
-    # Local development
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "ecommerce",
-            "USER": "postgres",
-            "PASSWORD": "DB_PASSWORD",
-            "HOST": "localhost",
-            "PORT": "5432",
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
 # -------------------------------------------------------------------
-# REST Framework (keeps your JWT config; modify if you want anonymous orders)
+# REST Framework
 # -------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    # You can add DEFAULT_PERMISSION_CLASSES if needed
 }
 
 # -------------------------------------------------------------------
 # Authentication backends
 # -------------------------------------------------------------------
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 
 # -------------------------------------------------------------------
-# Password validation (keep minimal or default)
+# Password validation
 # -------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -154,51 +140,32 @@ USE_I18N = True
 USE_TZ = True
 
 # -------------------------------------------------------------------
-# Static & media files (WhiteNoise for static)
+# Static & media files
 # -------------------------------------------------------------------
-
-# ------------------------
-# Static files
-# ------------------------
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # or str(BASE_DIR / "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "/static/"
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'
 
 # -------------------------------------------------------------------
-# CORS (keep open in dev, restrict in production)
-# -------------------------------------------------------------------
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    # In production, set DJANGO_CORS_ALLOWED_ORIGINS to comma separated origins
-    raw = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "")
-    origins = [o.strip() for o in raw.split(",") if o.strip()]
-    CORS_ALLOWED_ORIGINS = origins
-    CORS_ALLOW_CREDENTIALS = True
-
-# -------------------------------------------------------------------
 # Security headers & cookie settings for production
 # -------------------------------------------------------------------
-# Only enable the following when DEBUG is False and you use HTTPS (recommended)
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() in ("1", "true", "yes")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 60 * 60 * 24 * 30))  # 30 days by default
+    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 60 * 60 * 24 * 30))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
     X_FRAME_OPTIONS = "DENY"
 else:
-    # Development friendly defaults
     SECURE_SSL_REDIRECT = False
 
 # -------------------------------------------------------------------
-# Logging (basic)
+# Logging
 # -------------------------------------------------------------------
 LOG_LEVEL = os.environ.get("DJANGO_LOG_LEVEL", "INFO")
 LOGGING = {
@@ -214,11 +181,6 @@ LOGGING = {
 }
 
 # -------------------------------------------------------------------
-# Other helpful environment flags
+# Other environment flags
 # -------------------------------------------------------------------
-# Example: RENDER will set an env var; if you host elsewhere, adapt.
 ON_RENDER = os.environ.get("RENDER", "") != ""
-
-# -------------------------------------------------------------------
-# End of settings
-# -------------------------------------------------------------------
